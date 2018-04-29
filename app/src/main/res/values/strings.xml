@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Drop To Basket</string>
+    <string name="action_basket">Go to basket</string>
+    <string name="title_activity_dropped">In the basket</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="drop_all_to_basket">Drop all to basket</string>
+    <string name="my_product">My productName</string>
+    <string name="add_your_product">Add your productName</string>
+</resources>

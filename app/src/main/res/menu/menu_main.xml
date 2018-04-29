@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.karbyshev.droptobasket.activities.MainActivity">
+    <item
+        android:id="@+id/action_select_all"
+        android:orderInCategory="100"
+        android:title="@string/drop_all_to_basket"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_dropped"
+        android:orderInCategory="100"
+        android:title="@string/action_basket"
+        app:showAsAction="never" />
+</menu>
