@@ -1,12 +1,10 @@
-package com.karbyshev.droptobasket.activities;
+package com.karbyshev.droptobasket.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.widget.Toast;
 
 import com.karbyshev.droptobasket.App;
@@ -41,16 +39,16 @@ public class DroppedActivity extends AppCompatActivity implements IOnDroppedItem
         setContentView(R.layout.activity_dropped);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DroppedActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(DroppedActivity.this, MainActivity.class);
+//                startActivity(intent);
+//                finish();
+//            }
+//        });
 
         mAppDatabase = App.getInstance().getDatabase();
         mDroppedProductsDao = mAppDatabase.droppedProductsDao();

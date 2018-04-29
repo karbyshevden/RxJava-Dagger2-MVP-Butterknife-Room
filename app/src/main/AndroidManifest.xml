@@ -17,7 +17,7 @@
         android:name=".App"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".ui.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.DroppedActivity"
+            android:name=".ui.DroppedActivity"
             android:label="@string/title_activity_dropped"
             android:theme="@style/AppTheme.NoActionBar"/>
     </application>

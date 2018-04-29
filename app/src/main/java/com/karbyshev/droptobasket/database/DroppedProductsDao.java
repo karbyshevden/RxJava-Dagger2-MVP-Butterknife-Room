@@ -23,7 +23,7 @@ public interface DroppedProductsDao {
     void clearTable();
 
     @Insert
-    void insertAll (List<DroppedItem> list);
+    void insertAll(List<Item> list);
 
     @Insert
     void insert(DroppedItem... droppedItems);

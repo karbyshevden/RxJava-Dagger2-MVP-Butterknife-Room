@@ -1,6 +1,5 @@
-package com.karbyshev.droptobasket.activities;
+package com.karbyshev.droptobasket.ui;
 
-import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -27,9 +26,9 @@ import com.karbyshev.droptobasket.adapter.MainAdapter;
 import com.karbyshev.droptobasket.database.AppDatabase;
 import com.karbyshev.droptobasket.database.DroppedProductsDao;
 import com.karbyshev.droptobasket.database.ProductsDao;
+import com.karbyshev.droptobasket.model.DroppedItem;
 import com.karbyshev.droptobasket.model.Item;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -58,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
     private ProductsDao mProductsDao;
     private DroppedProductsDao mDroppedProductsDao;
     private Item item = new Item();
+    private DroppedItem mDroppedItem = new DroppedItem();
 
     private String product;
 
@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
 
         mAppDatabase = App.getInstance().getDatabase();
         mProductsDao = mAppDatabase.productsDao();
+        mDroppedProductsDao = mAppDatabase.droppedProductsDao();
 
         mMainRecyclerView.setHasFixedSize(true);
         mGridLayoutManager = new GridLayoutManager(this, 3);
@@ -127,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
         final View customView = inflater.inflate(R.layout.popup_window, null);
 
+
         mPopupWindow = new PopupWindow(customView,
                 LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT);
@@ -165,6 +167,12 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
             }
         });
 
+        customView.findViewById(R.id.popupImageView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+
         mPopupWindow.setFocusable(true);
         mPopupWindow.update();
         mPopupWindow.showAtLocation(mConstraintLayout, Gravity.CENTER, 0, 0);
@@ -173,8 +181,10 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
     @Override
     public void OnItemClick(int position, List<Item> list) {
         item = list.get(position);
+        mDroppedItem.setProductName(item.getProductName());
 
         Single.create(e -> {
+            mAppDatabase.droppedProductsDao().insert(mDroppedItem);
             mAppDatabase.productsDao().deleteItem(item);
             e.onSuccess(new Object());
         }).subscribeOn(Schedulers.io())

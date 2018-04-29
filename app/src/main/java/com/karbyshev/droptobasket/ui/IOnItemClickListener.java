@@ -1,4 +1,4 @@
-package com.karbyshev.droptobasket.activities;
+package com.karbyshev.droptobasket.ui;
 
 import com.karbyshev.droptobasket.model.Item;
 

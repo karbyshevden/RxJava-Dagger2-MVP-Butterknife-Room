@@ -11,7 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.karbyshev.droptobasket.R;
-import com.karbyshev.droptobasket.activities.IOnDroppedItemClickListener;
+import com.karbyshev.droptobasket.ui.IOnDroppedItemClickListener;
 import com.karbyshev.droptobasket.model.DroppedItem;
 
 import java.util.ArrayList;
