@@ -11,6 +11,7 @@
 
     <RelativeLayout
         android:id="@+id/itemRelativeLayout"
+        android:background="@color/itemBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -18,7 +19,7 @@
             android:id="@+id/itemImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_add_shopping_cart_black_24dp" />
+            android:src="@drawable/ic_local_grocery_store_black_24dp"/>
 
         <TextView
             android:id="@+id/itemTextView"
@@ -26,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="@android:drawable/screen_background_dark_transparent"
-            android:gravity="center_horizontal"
+            android:gravity="center"
             android:padding="4dp"
             android:text="@string/my_product"
             android:textColor="#fff"

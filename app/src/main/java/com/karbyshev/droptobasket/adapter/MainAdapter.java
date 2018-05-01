@@ -13,6 +13,9 @@ import android.widget.TextView;
 import com.karbyshev.droptobasket.R;
 import com.karbyshev.droptobasket.ui.IOnItemClickListener;
 import com.karbyshev.droptobasket.model.Item;
+import com.karbyshev.droptobasket.utils.BitmapUtils;
+import com.karbyshev.droptobasket.utils.Config;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +48,12 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Item item = itemList.get(position);
 
-        //How do not change color every time when the adapter has changed
-        holder.mRelativeLayout.setBackgroundColor(getRandomColor());
         holder.mTextView.setText(item.getProductName());
+        if (item.getImage().equals("")){
+            holder.mImageView.setImageResource(R.drawable.ic_local_grocery_store_black_24dp);
+        } else {
+            Picasso.get().load(item.getImage()).fit().centerCrop().into(holder.mImageView);
+        }
     }
 
     @Override
@@ -84,11 +90,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
 
     public void addProduct(List<Item> list){
         itemList = list;
-        notifyDataSetChanged();
-    }
-
-    public void clearProduct(){
-        itemList.clear();
         notifyDataSetChanged();
     }
 

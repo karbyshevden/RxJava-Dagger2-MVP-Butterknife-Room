@@ -13,9 +13,12 @@ import android.widget.TextView;
 import com.karbyshev.droptobasket.R;
 import com.karbyshev.droptobasket.ui.IOnDroppedItemClickListener;
 import com.karbyshev.droptobasket.model.DroppedItem;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import android.view.ViewGroup.LayoutParams;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,8 +42,15 @@ public class DroppedAdapter extends RecyclerView.Adapter<DroppedAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DroppedItem item = itemList.get(position);
 
-        holder.mRelativeLayout.setBackgroundColor(Color.GRAY);
+        LayoutParams params = (LayoutParams) holder.mTextView.getLayoutParams();
+        params.height = LayoutParams.MATCH_PARENT;
+        holder.mTextView.setLayoutParams(params);
         holder.mTextView.setText(item.getProductName());
+        if (item.getImage().equals("")) {
+            holder.mImageView.setImageResource(R.drawable.ic_local_grocery_store_black_24dp);
+        } else {
+            Picasso.get().load(item.getImage()).fit().centerCrop().into(holder.mImageView);
+        }
     }
 
     @Override
@@ -48,7 +58,7 @@ public class DroppedAdapter extends RecyclerView.Adapter<DroppedAdapter.ViewHold
         return itemList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.itemImageView)
         ImageView mImageView;
@@ -56,6 +66,7 @@ public class DroppedAdapter extends RecyclerView.Adapter<DroppedAdapter.ViewHold
         TextView mTextView;
         @BindView(R.id.itemRelativeLayout)
         RelativeLayout mRelativeLayout;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -63,9 +74,9 @@ public class DroppedAdapter extends RecyclerView.Adapter<DroppedAdapter.ViewHold
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mListener != null){
+                    if (mListener != null) {
                         int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION){
+                        if (position != RecyclerView.NO_POSITION) {
 
                             mListener.OnItemClick(position, itemList);
                         }
@@ -75,7 +86,7 @@ public class DroppedAdapter extends RecyclerView.Adapter<DroppedAdapter.ViewHold
         }
     }
 
-    public void addDropped(List<DroppedItem> items){
+    public void addDropped(List<DroppedItem> items) {
         itemList = items;
         notifyDataSetChanged();
     }
