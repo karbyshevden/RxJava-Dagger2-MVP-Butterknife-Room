@@ -3,8 +3,11 @@ package com.karbyshev.droptobasket.ui;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -24,6 +27,7 @@ import com.karbyshev.droptobasket.model.Item;
 import com.karbyshev.droptobasket.utils.BitmapUtils;
 import com.karbyshev.droptobasket.utils.Config;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -72,12 +76,7 @@ public class AddingDialog extends DialogFragment {
         mPopupAddFromGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity().getApplicationContext(),
-                        "Not working yet!",
-                        Toast.LENGTH_SHORT)
-                        .show();
-                //Сережа помоги!!!)))
-//                takePhotoFromGallery();
+                takePhotoFromGallery();
             }
         });
 
@@ -169,7 +168,16 @@ public class AddingDialog extends DialogFragment {
                     mPopupVisibilityLinearLayout.setVisibility(View.GONE);
                     mPopupImageView.setVisibility(View.VISIBLE);
                     Uri selectedImage = data.getData();
-                    mPopupImageView.setImageURI(selectedImage);
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity()
+                                .getApplicationContext().getContentResolver(), selectedImage);
+                        mPopupImageView.setImageBitmap(bitmap);
+
+                        File finalFile = new File(bitmapUtils.getRealPathFromURI(selectedImage, getActivity().getApplicationContext()));
+                        bitmapUtils.setSavedImagePath(finalFile.getAbsolutePath());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
         }

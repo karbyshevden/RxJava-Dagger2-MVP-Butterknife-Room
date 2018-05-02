@@ -73,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
     private DroppedProductsDao mDroppedProductsDao;
     private Item item;
     private DroppedItem mDroppedItem;
+    private Disposable task;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
 
     @OnClick(R.id.fab)
     public void addProduct(View view) {
+        task.dispose();
         AddingDialog addingDialog = new AddingDialog();
         FragmentManager manager = getFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
@@ -122,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
             if (mMainAdapter.getItemList().size() == 0) {
                 Toast.makeText(this, "Nothing to select", Toast.LENGTH_SHORT).show();
             } else {
-                Disposable task = mAppDatabase.productsDao().getAll()
+                task = mAppDatabase.productsDao().getAll()
                                                 .subscribeOn(Schedulers.io())
                                                 .observeOn(Schedulers.io())
                                                 .subscribe(items -> {
@@ -133,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
                                                 mAppDatabase.droppedProductsDao().insertAll(dropped);
                                                 mAppDatabase.productsDao().clearTable();
                                             });
+
 
                 showAllItems();
 
