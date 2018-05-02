@@ -39,6 +39,7 @@ import com.karbyshev.droptobasket.utils.Config;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -97,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
 
     @OnClick(R.id.fab)
     public void addProduct(View view) {
-
         AddingDialog addingDialog = new AddingDialog();
         FragmentManager manager = getFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
@@ -122,12 +122,11 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
                 Toast.makeText(this, "Nothing to select", Toast.LENGTH_SHORT).show();
             } else {
                 //Transaction to dropped list
-
                 //Delete all
-                Single.create(e -> {
+                Flowable.create(e -> {
                     mAppDatabase.productsDao().clearTable();
-                    e.onSuccess(new Object());
-                }).subscribeOn(Schedulers.io())
+                    e.onNext(new Object());
+                }, BackpressureStrategy.BUFFER).subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe();
 
@@ -168,22 +167,6 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
                         mMainAdapter.addProduct(list);
                     }
                 });
-
-
-//                        (new Consumer<List<Item>>() {
-//                    @Override
-//                    public void accept(List<Item> list) throws Exception {
-//                        mMainAdapter.addProduct(list);
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Toast.makeText(getApplicationContext(),
-//                                "Something wrong",
-//                                Toast.LENGTH_SHORT)
-//                                .show();
-//                    }
-//                });
     }
 }
 
