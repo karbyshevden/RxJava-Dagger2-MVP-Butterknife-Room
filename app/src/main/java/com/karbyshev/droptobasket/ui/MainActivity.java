@@ -50,6 +50,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -121,14 +122,17 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
             if (mMainAdapter.getItemList().size() == 0) {
                 Toast.makeText(this, "Nothing to select", Toast.LENGTH_SHORT).show();
             } else {
-                //Transaction to dropped list
-                //Delete all
-                Flowable.create(e -> {
-                    mAppDatabase.productsDao().clearTable();
-                    e.onNext(new Object());
-                }, BackpressureStrategy.BUFFER).subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe();
+                Disposable task = mAppDatabase.productsDao().getAll()
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(Schedulers.io())
+                                                .subscribe(items -> {
+                                                ArrayList<DroppedItem> dropped = new ArrayList<>();
+                                                for(Item it: items) {
+                                                        dropped.add(new DroppedItem(it));
+                                                    }
+                                                mAppDatabase.droppedProductsDao().insertAll(dropped);
+                                                mAppDatabase.productsDao().clearTable();
+                                            });
 
                 showAllItems();
 
