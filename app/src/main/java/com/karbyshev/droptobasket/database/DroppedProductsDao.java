@@ -24,7 +24,7 @@ public interface DroppedProductsDao {
     void clearTable();
 
     @Insert
-    void insertAll(List<Item> list);
+    void insertAll(List<DroppedItem> list);
 
     @Insert
     void insert(DroppedItem... droppedItems);

@@ -14,6 +14,14 @@ public class DroppedItem implements Serializable{
     String image;
     String productName;
 
+    public DroppedItem() {
+    }
+
+    public DroppedItem(Item item) {
+        image = item.image;
+        productName = item.productName;
+    }
+
     public int getId() {
         return id;
     }

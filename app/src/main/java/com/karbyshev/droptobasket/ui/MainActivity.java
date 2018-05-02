@@ -37,8 +37,11 @@ import com.karbyshev.droptobasket.model.Item;
 import com.karbyshev.droptobasket.utils.BitmapUtils;
 import com.karbyshev.droptobasket.utils.Config;
 
+import org.reactivestreams.Publisher;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -49,7 +52,9 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -124,15 +129,19 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
                 //Transaction to dropped list
 
                 //Delete all
-                Single.create(e -> {
-                    mAppDatabase.productsDao().clearTable();
-                    e.onSuccess(new Object());
-                }).subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe();
+                Disposable task = mAppDatabase.productsDao().getAll()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(items -> {
+                            ArrayList<DroppedItem> dropped = new ArrayList<>();
+                            for(Item it: items) {
+                                dropped.add(new DroppedItem(it));
+                            }
+                            mAppDatabase.droppedProductsDao().insertAll(dropped);
+                            mAppDatabase.productsDao().clearTable();
+                        });
 
                 showAllItems();
-
                 Toast.makeText(this, "All selected", Toast.LENGTH_SHORT).show();
             }
         }
