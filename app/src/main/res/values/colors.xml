@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#5840ba</color>
     <color name="colorAccent">#5840ba</color>
     <color name="itemBackground">#9d92cc</color>
+    <color name="droppedToolbar">#7b7b7b</color>
 </resources>

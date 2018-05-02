@@ -1,5 +1,8 @@
 package com.karbyshev.droptobasket.ui;
 
+import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -47,7 +50,6 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements IOnItemClickListener {
-    private static final int REQUEST_TAKE_PHOTO = 1;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -58,19 +60,13 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
     @BindView(R.id.mainRecyclerView)
     RecyclerView mMainRecyclerView;
 
-    private PopupWindow mPopupWindow;
     private MainAdapter mMainAdapter;
     private GridLayoutManager mGridLayoutManager;
     private AppDatabase mAppDatabase;
     private ProductsDao mProductsDao;
     private DroppedProductsDao mDroppedProductsDao;
-    private Item item = new Item();
-    private BitmapUtils bitmapUtils = new BitmapUtils(this);
-    private DroppedItem mDroppedItem = new DroppedItem();
-    private ImageView popupImageView;
-
-    private String product;
-
+    private Item item;
+    private DroppedItem mDroppedItem;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
         mAppDatabase = App.getInstance().getDatabase();
         mProductsDao = mAppDatabase.productsDao();
         mDroppedProductsDao = mAppDatabase.droppedProductsDao();
+
+        item = new Item();
+        mDroppedItem = new DroppedItem();
 
         mMainRecyclerView.setHasFixedSize(true);
         mGridLayoutManager = new GridLayoutManager(this, 3);
@@ -94,8 +93,11 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
 
     @OnClick(R.id.fab)
     public void addProduct(View view) {
-        bitmapUtils.setSavedImagePath("");
-        openPopupWindow();
+
+        AddingDialog addingDialog = new AddingDialog();
+        FragmentManager manager = getFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        addingDialog.show(transaction, "dialog");
     }
 
     @Override
@@ -151,71 +153,7 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
         showAllItems();
     }
 
-    private void openPopupWindow() {
-        LayoutInflater inflater = (LayoutInflater) getApplicationContext()
-                .getSystemService(LAYOUT_INFLATER_SERVICE);
-        final View customView = inflater.inflate(R.layout.popup_window, null);
-        popupImageView = (ImageView) customView.findViewById(R.id.popupImageView);
-
-
-        mPopupWindow = new PopupWindow(customView, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-
-        //How to implement Butterknife here???!!!
-        //Cancel popup
-        customView.findViewById(R.id.popupCancelButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPopupWindow.dismiss();
-            }
-        });
-
-        //OK popup
-        customView.findViewById(R.id.popupOkButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText editText = (EditText) customView.findViewById(R.id.popupEditText);
-                product = editText.getText().toString();
-
-                if (TextUtils.isEmpty(product)) {
-                    Toast.makeText(getApplicationContext(),
-                            "Add something to list!",
-                            Toast.LENGTH_SHORT)
-                            .show();
-                } else {
-                    item.setProductName(product);
-                    if (bitmapUtils.getSavedImagePath().equals("")){
-                        item.setImage("");
-                    } else {
-                        item.setImage(Config.fileUriPrefix + bitmapUtils.getSavedImagePath());
-                    }
-                    Single.create(e -> {
-                        mAppDatabase.productsDao().insert(item);
-                        e.onSuccess(new Object());
-                    }).subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe();
-
-                    mPopupWindow.dismiss();
-                    showAllItems();
-                    System.out.println(item.getImage());
-                }
-            }
-        });
-
-        //Take a picture
-        popupImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                launchCamera();
-            }
-        });
-
-        mPopupWindow.setFocusable(true);
-        mPopupWindow.update();
-        mPopupWindow.showAtLocation(mConstraintLayout, Gravity.CENTER, 0, 0);
-    }
-
-    private void showAllItems() {
+    public void showAllItems() {
 
         mAppDatabase.productsDao().getAll()
                 .subscribeOn(Schedulers.io())
@@ -235,35 +173,6 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
                     }
                 });
     }
-
-    private void launchCamera() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = bitmapUtils.createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.karbyshev.droptobasket.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-            }
-        }
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            bitmapUtils.setPic(popupImageView);
-        }
-    }
 }
+
 
