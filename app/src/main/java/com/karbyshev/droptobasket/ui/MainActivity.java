@@ -101,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
 
     @OnClick(R.id.fab)
     public void addProduct(View view) {
-        task.dispose();
         AddingDialog addingDialog = new AddingDialog();
         FragmentManager manager = getFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
@@ -135,12 +134,14 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
                                                     }
                                                 mAppDatabase.droppedProductsDao().insertAll(dropped);
                                                 mAppDatabase.productsDao().clearTable();
+
                                             });
 
 
                 showAllItems();
 
                 Toast.makeText(this, "All selected", Toast.LENGTH_SHORT).show();
+                task.dispose();
             }
         }
 
