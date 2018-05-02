@@ -10,13 +10,14 @@ import com.karbyshev.droptobasket.model.Item;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 
 @Dao
 public interface ProductsDao {
 
     @Query("SELECT * FROM item")
-    Single<List<Item>> getAll();
+    Flowable<List<Item>> getAll();
 
     @Query("DELETE FROM item")
     void clearTable();

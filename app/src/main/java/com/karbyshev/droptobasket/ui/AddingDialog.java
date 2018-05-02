@@ -29,6 +29,8 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -53,7 +55,6 @@ public class AddingDialog extends DialogFragment {
     private BitmapUtils bitmapUtils;
     private Item item;
     private AppDatabase mAppDatabase;
-    private String imageFromGallery;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -75,6 +76,7 @@ public class AddingDialog extends DialogFragment {
                         "Not working yet!",
                         Toast.LENGTH_SHORT)
                         .show();
+                //Сережа помоги!!!)))
 //                takePhotoFromGallery();
             }
         });
@@ -105,10 +107,11 @@ public class AddingDialog extends DialogFragment {
                                 item.setImage(Config.fileUriPrefix + bitmapUtils.getSavedImagePath());
                             }
 
-                            Single.create(e -> {
+                            Flowable.create(e -> {
                                 mAppDatabase.productsDao().insert(item);
-                                e.onSuccess(new Object());
-                            }).subscribeOn(Schedulers.io())
+                                e.onNext(new Object());
+                            }, BackpressureStrategy.BUFFER)
+                                    .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe();
 

@@ -19,6 +19,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -70,19 +71,12 @@ public class DroppedActivity extends AppCompatActivity implements IOnDroppedItem
 
     private void showAllDroppedItems(){
         mAppDatabase.droppedProductsDao().getAll()
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableSingleObserver<List<DroppedItem>>() {
+                .subscribe(new Consumer<List<DroppedItem>>() {
                     @Override
-                    public void onSuccess(List<DroppedItem> droppedItems) {
-                        mDroppedAdapter.addDropped(droppedItems);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(getApplicationContext(), "RX ERROR!", Toast.LENGTH_SHORT).show();
+                    public void accept(List<DroppedItem> items) throws Exception {
+                        mDroppedAdapter.addDropped(items);
                     }
                 });
-
     }
 }

@@ -44,8 +44,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -142,11 +146,12 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
         mDroppedItem.setProductName(item.getProductName());
         mDroppedItem.setImage(item.getImage());
 
-        Single.create(e -> {
+        Flowable.create(subscriber -> {
             mAppDatabase.droppedProductsDao().insert(mDroppedItem);
             mAppDatabase.productsDao().deleteItem(item);
-            e.onSuccess(new Object());
-        }).subscribeOn(Schedulers.io())
+            subscriber.onNext(new Object());
+        }, BackpressureStrategy.BUFFER)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
 
@@ -156,22 +161,29 @@ public class MainActivity extends AppCompatActivity implements IOnItemClickListe
     public void showAllItems() {
 
         mAppDatabase.productsDao().getAll()
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableSingleObserver<List<Item>>() {
+                .subscribe(new Consumer<List<Item>>() {
                     @Override
-                    public void onSuccess(List<Item> list) {
+                    public void accept(List<Item> list) throws Exception {
                         mMainAdapter.addProduct(list);
                     }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(getApplicationContext(),
-                                "Something wrong",
-                                Toast.LENGTH_SHORT)
-                                .show();
-                    }
                 });
+
+
+//                        (new Consumer<List<Item>>() {
+//                    @Override
+//                    public void accept(List<Item> list) throws Exception {
+//                        mMainAdapter.addProduct(list);
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Toast.makeText(getApplicationContext(),
+//                                "Something wrong",
+//                                Toast.LENGTH_SHORT)
+//                                .show();
+//                    }
+//                });
     }
 }
 
