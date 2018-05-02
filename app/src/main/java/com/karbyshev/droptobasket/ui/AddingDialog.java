@@ -8,15 +8,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.karbyshev.droptobasket.App;
@@ -36,17 +34,26 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class AddingDialog extends DialogFragment {
-    private static final int REQUEST_TAKE_PHOTO = 1;
+    private static final int REQUEST_TAKE_PHOTO = 0;
+    private static final int REQUEST_TAKE_FROM_GALLARY = 1;
+
     private String product;
 
     @BindView(R.id.popupImageView)
-    ImageView popupImageView;
+    ImageView mPopupImageView;
     @BindView(R.id.popupEditText)
-    EditText editText;
+    EditText mEditText;
+    @BindView(R.id.popupAddFromCamera)
+    ImageView mPopupAddFromCamera;
+    @BindView(R.id.popupAddFromGallery)
+    ImageView mPopupAddFromGallery;
+    @BindView(R.id.popupVisibilityLinearLayout)
+    LinearLayout mPopupVisibilityLinearLayout;
 
     private BitmapUtils bitmapUtils;
     private Item item;
     private AppDatabase mAppDatabase;
+    private String imageFromGallery;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -61,7 +68,18 @@ public class AddingDialog extends DialogFragment {
         item = new Item();
         mAppDatabase = App.getInstance().getDatabase();
 
-        popupImageView.setOnClickListener(new View.OnClickListener() {
+        mPopupAddFromGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity().getApplicationContext(),
+                        "Not working yet!",
+                        Toast.LENGTH_SHORT)
+                        .show();
+//                takePhotoFromGallery();
+            }
+        });
+
+        mPopupAddFromCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 launchCamera();
@@ -72,7 +90,7 @@ public class AddingDialog extends DialogFragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
-                        product = editText.getText().toString();
+                        product = mEditText.getText().toString();
 
                         if (TextUtils.isEmpty(product)) {
                             Toast.makeText(getActivity().getApplicationContext(),
@@ -87,7 +105,6 @@ public class AddingDialog extends DialogFragment {
                                 item.setImage(Config.fileUriPrefix + bitmapUtils.getSavedImagePath());
                             }
 
-//                            ((MainActivity) getActivity()).okClicked();
                             Single.create(e -> {
                                 mAppDatabase.productsDao().insert(item);
                                 e.onSuccess(new Object());
@@ -109,16 +126,13 @@ public class AddingDialog extends DialogFragment {
 
     public void launchCamera() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            // Create the File where the photo should go
             File photoFile = null;
             try {
                 photoFile = bitmapUtils.createImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
             }
-            // Continue only if the File was successfully created
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(getActivity().getApplicationContext(),
                         "com.karbyshev.droptobasket.fileprovider",
@@ -130,10 +144,31 @@ public class AddingDialog extends DialogFragment {
 
     }
 
+    public void takePhotoFromGallery(){
+        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickPhoto , REQUEST_TAKE_FROM_GALLARY);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == getActivity().RESULT_OK) {
-            bitmapUtils.setPic(popupImageView);
+        switch (requestCode) {
+            case 0:
+                if (resultCode == getActivity().RESULT_OK) {
+                    mPopupVisibilityLinearLayout.setVisibility(View.GONE);
+                    mPopupImageView.setVisibility(View.VISIBLE);
+                    bitmapUtils.setPic(mPopupImageView);
+                }
+                break;
+
+            case 1:
+                if (resultCode == getActivity().RESULT_OK){
+                    mPopupVisibilityLinearLayout.setVisibility(View.GONE);
+                    mPopupImageView.setVisibility(View.VISIBLE);
+                    Uri selectedImage = data.getData();
+                    mPopupImageView.setImageURI(selectedImage);
+                }
+                break;
         }
     }
 }

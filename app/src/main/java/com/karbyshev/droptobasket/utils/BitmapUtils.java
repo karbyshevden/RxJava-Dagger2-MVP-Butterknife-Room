@@ -82,7 +82,7 @@ public class BitmapUtils{
         // Create the new file in the external storage
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
                 Locale.getDefault()).format(new Date());
-        String imageFileName = "BUSKET_" + timeStamp + ".jpg";
+        String imageFileName = "BASKET_" + timeStamp + ".jpg";
         File storageDir = new File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
                         + "/Basket");

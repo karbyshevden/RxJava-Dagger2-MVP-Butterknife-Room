@@ -6,7 +6,8 @@
     <string name="cancel">Cancel</string>
     <string name="drop_all_to_basket">Drop all to basket</string>
     <string name="my_product">My productName</string>
-    <string name="add_your_product">Add your productName</string>
+    <string name="add_your_product">Add your product name</string>
     <string name="error">Error</string>
     <string name="saved_message">Image Saved at %1$s</string>
+    <string name="or">OR</string>
 </resources>
